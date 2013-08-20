@@ -454,13 +454,15 @@ class ProxyServer(asyncore.dispatcher):
 
     def handle_accept(self):
         """Accept a new connection from a client."""
-        channel, addr = self.accept()
-        if addr[0] == '127.0.0.1' or options.allow_remote:
-            ClientChannel(channel, addr,
-                          self.download_throttle, self.upload_throttle)
-        else:
-            channel.close()
-            debug("remote client %s:%d not allowed" % addr)
+        channel_and_addr = self.accept()
+        if channel_and_addr is not None:
+            channel, addr = channel_and_addr
+            if addr[0] == '127.0.0.1' or options.allow_remote:
+                ClientChannel(channel, addr,
+                              self.download_throttle, self.upload_throttle)
+            else:
+                channel.close()
+                debug("remote client %s:%d not allowed" % addr)
 
 
 if __name__ == '__main__':
